@@ -1,4 +1,15 @@
-# Create s3 bucket for terraform state file
+# store the terraform state file in s3
+terraform {
+  backend "s3" {
+    bucket  = "eks-project-homelab-backend-bucket004"
+    key     = "vpc-terraform-github-action.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
+}
+
+
+/*# Create s3 bucket for terraform state file
 resource "aws_s3_bucket" "terraform_state" {
   bucket = var.bucket_name # Change to a unique bucket name
   force_destroy = true
@@ -41,4 +52,4 @@ terraform {
         use_lockfile = true
         encrypt = true
     }
-}
+}*/
