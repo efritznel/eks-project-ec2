@@ -33,19 +33,24 @@
 
 # Step 3. Create Kubernetes EKS cluster in our VPC with TF
 
-# Step 4. Create a Dockerfile, create a docker image for our application and push Image to Dockerhub
+# Step 4. Node tab is empty - provide access to the IAM user by running those commands
+aws eks create-access-entry `
+  --cluster-name my-eks-cluster `
+  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin `
+  --type STANDARD `
+  --region us-east-1
 
-# Step 5. Deploy our web app manifest files using Kubectl
+****************************************************************
+aws eks associate-access-policy `
+  --cluster-name my-eks-cluster `
+  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin `
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy `
+  --access-scope type=cluster `
+  --region us-east-1
 
-    - Create Deployment
-    
-    - Create service of type Loadbalancer
-
-# Step 6. Access our web app from our internet browser using the Load balancer external IP
-
-**************************************************************************************************
+# Step 5. Create a Dockerfile, create a docker image for our application and push Image to Dockerhub
 # Webserver deployment
-We have created a folder name website with 2 files: dokerfile and index.html
+We have created a folder name website with 2 files: Dokerfile and index.html
 
 Create a folder name: website inside your folder project
 
@@ -76,7 +81,12 @@ Command: docker build -t efritznel/ithomelab-webpage:latest .
         
         - docker push username/image-name (efritznel/ithomelab-webpage:latest)
 
-*****************************************************************************************************
+# Step 6. Deploy our web app manifest files using Kubectl
+
+    - Create Deployment.yaml file
+    
+    - Create service.yaml of type Loadbalancer
+
 # Need kubectl installed on your computer - to deploy Pods
 
         - kubectl get nodes
@@ -92,6 +102,11 @@ Command: docker build -t efritznel/ithomelab-webpage:latest .
         - kubectl apply -f service.yaml
         
         - kubectl get pods
+
+# Step 6. Access our web app from our internet browser using the Load balancer DNS name
+
+
+
         
-        
+
 

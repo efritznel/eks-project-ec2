@@ -1,5 +1,5 @@
 resource "aws_security_group" "worker_nodes_sg" {
-  name        = "eks-test"
+  name        = "eks-worker-nodes-sg"
   description = "Security group for EKS worker nodes"
   vpc_id      = var.vpc_id
 
