@@ -3,13 +3,9 @@ resource "aws_eks_cluster" "my-eks-cluster" {
   name     = "my-eks-cluster"
   role_arn = aws_iam_role.eks_cluster_role.arn
 
-  /* vpc_config {
-    subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
-  } */
-
   vpc_config {
-    subnet_ids = var.private_subnet_ids
-  }
+    subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
+  } 
 
   depends_on = [
     aws_iam_role.eks_cluster_role,
@@ -40,9 +36,8 @@ remote_access {
     source_security_group_ids = [var.sg_ids]
   }
 
-  # subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
+  subnet_ids = [var.subnet_ids[0], var.subnet_ids[1]]
 
-  subnet_ids = var.private_subnet_ids
 
   depends_on = [
     aws_iam_role_policy_attachment.AmazonEKSWorkerNodePolicy,
