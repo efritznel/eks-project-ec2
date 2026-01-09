@@ -104,6 +104,7 @@ Command: docker build -t efritznel/ithomelab-webpage:latest .
         - kubectl get pods
 
 # Step 6. Access our web app from our internet browser using the Load balancer DNS name
+![Project Image](https://github.com/efritznel/eks-project/blob/main/Access%20webpage.GIF)
 
 
 
