@@ -1,0 +1,24 @@
+deploymentName: webapp
+replicaCount: 2
+
+labels:
+  app.kubernetes.io/name: webapp
+  app.kubernetes.io/part-of: ithomelab
+
+selectorLabels:
+  app.kubernetes.io/name: webapp
+
+container:
+  name: webapp
+
+image:
+  repository: efritznel/ithomelab-webpage
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  name: webapp-service
+  type: LoadBalancer
+  port: 80
+  targetPort: 80
+
