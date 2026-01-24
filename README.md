@@ -126,7 +126,8 @@ Command: docker build -t efritznel/ithomelab-webpage:latest .
 			
 		- values.yaml (to add the default value for the variables we are using in Deployment and Service .yaml)
 
-#deployment.yaml
+```yaml
+# deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -151,7 +152,10 @@ spec:
             - name: http
               containerPort: {{ .Values.service.targetPort | default 80 }}
               protocol: TCP
+```
 
+***************************************************************************
+```yaml
 #service.yaml
 apiVersion: v1
 kind: Service
@@ -168,7 +172,9 @@ spec:
       protocol: TCP
       port: {{ .Values.service.port | default 80 }}
       targetPort: {{ .Values.service.targetPort | default 80 }}
-
+```
+***************************************************************************
+```yaml
 #value.yaml
 deploymentName: webapp
 replicaCount: 2
@@ -192,8 +198,9 @@ service:
   name: webapp-service
   type: LoadBalancer
   port: 80
-  targetPort: 80		
-		
+  targetPort: 80
+  ```
+***************************************************************************		
 	4. Validate the manifest file: "helm template app/"
 		
 	5. Install the application: "helm install webapp app/"
