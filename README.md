@@ -114,7 +114,7 @@ Command: docker build -t efritznel/ithomelab-webpage:latest .
 
 # Deploy our web app manifest files using HELM
 
-        1. go inside the manifest folder
+    1. go inside the manifest folder
 		
 	2. Create a custom HELM chart: "helm create app"
 		
