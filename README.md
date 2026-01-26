@@ -153,7 +153,7 @@ helm create app
 # Sample Deployment Template
 
 ```yaml
-# deployment.yaml
+#deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
