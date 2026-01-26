@@ -1,130 +1,156 @@
-# Project Highlight: Highly Available EKS Architecture with Terraform & GitHub Actions
+# Project Highlight: Highly Available Amazon EKS Architecture
+
+Terraform · GitHub Actions · Docker · Helm · Kubernetes
 
 ![Project Image](https://github.com/efritznel/eks-project/blob/main/EKS-cluster.png)
-# Setp 1. Create Remote backend
 
-    - Create our remote backend to store our terraform configuration
-    
-    - Create s3 bucket using TF
-    
-    - Create DynamoDB using TF
+# Overview
 
-# Step 2. Create our main Infrastructure
+This project demonstrates how to build a highly available Amazon EKS cluster using Terraform, deploy containerized workloads, and manage application delivery using kubectl and Helm.
 
-    - One VPC
-    
-    - Subnets (2 Private and 2 Public subnets in 2 different AZ) 
-       
-    - Internet Gateway
-    
-    - NAT Gateway
-    
-    - Route Table
-    
-    - Routes
-    
-    - Route table association
-    
-    - SGs
-    
-    - Bastion Host (EC2) in our public subnet for SSH and Downloads
+The infrastructure is fully automated with Terraform, follows AWS best practices for network isolation and security, and supports CI/CD-ready workflows with Docker images hosted in Docker Hub.
 
-# Step 3. Create Kubernetes EKS cluster in our VPC with TF
+# Architecture Highlights
 
-# Step 4. Node tab is empty - provide access to the IAM user by running those commands
+- Multi-AZ VPC design (public + private subnets)
 
-# Switch the cluster mode first
-aws eks update-cluster-config `
-  --name my-eks-cluster `
-  --region us-east-1 `
+- Private EKS worker nodes
+
+- Bastion host for controlled administrative access
+
+- Secure outbound access via NAT Gateway
+
+- Scalable Kubernetes workloads
+
+- Application exposure via AWS LoadBalancer Service
+
+# Step 1: Create Remote Backend (Terraform State)
+
+A remote backend is used to securely store Terraform state and enable state locking.
+
+Resources created:
+
+- S3 bucket (Terraform state storage)
+
+- DynamoDB table (state locking)
+
+# Step 2: Provision Core AWS Infrastructure
+
+Terraform provisions the foundational AWS resources:
+
+- VPC
+
+- 2 Public subnets (Multi-AZ)
+
+- 2 Private subnets (Multi-AZ)
+
+- Internet Gateway
+
+- NAT Gateway
+
+- Route tables and associations
+
+- Security Groups
+
+- Bastion Host (EC2) in public subnet
+Used for SSH access and administrative downloads
+
+# Step 3: Create Amazon EKS Cluster
+
+- EKS control plane deployed into the VPC
+
+- Worker nodes launched in private subnets
+
+- Cluster networking integrated with VPC CIDR
+
+# Step 4: Grant IAM User Access to the Cluster
+
+If the Nodes tab is empty, access must be explicitly granted.
+
+# Enable EKS access mode
+
+aws eks update-cluster-config \
+  --name my-eks-cluster \
+  --region us-east-1 \
   --access-config authenticationMode=API_AND_CONFIG_MAP
 
-****************************************************************
+# Create access entry
 
-aws eks create-access-entry `
-  --cluster-name my-eks-cluster `
-  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin `
-  --type STANDARD `
+aws eks create-access-entry \
+  --cluster-name my-eks-cluster \
+  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin \
+  --type STANDARD \
   --region us-east-1
 
-****************************************************************
-aws eks associate-access-policy `
-  --cluster-name my-eks-cluster `
-  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin `
-  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy `
-  --access-scope type=cluster `
+# Associate admin policy
+
+aws eks associate-access-policy \
+  --cluster-name my-eks-cluster \
+  --principal-arn arn:aws:iam::153435306748:user/ithomelabadmin \
+  --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
+  --access-scope type=cluster \
   --region us-east-1
 
-# Step 5. Create a Dockerfile, create a docker image for our application and push Image to Dockerhub
-# Webserver deployment
-We have created a folder name website with 2 files: Dokerfile and index.html
+# Step 5: Build and Push Application Docker Image
+# Application Structure
 
-Create a folder name: website inside your folder project
+mkdir website
 
-    - mkdir website
-    
-    - cd website/
-    
-    - touch index.html Dockerfile
+cd website
 
-# Create Docker image and push it to dockerhub
+touch Dockerfile index.html
 
-After creating the index.html and dockerfile - now we are going to create the docker image - we need docker deskstop install in our local computer
+# Build Docker image
 
-# build the image
-Command: docker build -t efritznel/ithomelab-webpage:latest .
+docker build -t efritznel/ithomelab-webpage:latest .
 
-        - efritznel: is the dockerhub username
-        
-        - ithomelab-webpage:latest : is the name of the created image 
+# Verify image
 
-# To see the freshly created image
+docker images
 
-        - docker images
+# Push to Docker Hub
 
-# Push the image to Dockerhub
+docker login
 
-        - docker login
-        
-        - docker push username/image-name (efritznel/ithomelab-webpage:latest)
+docker push efritznel/ithomelab-webpage:latest
 
-# You can deploy the application either using kubectl or HELM both need to be installed on your PC
+# Step 6: Deploy Application Using kubectl
 
-# Deploy our web app manifest files using Kubectl
+# Kubernetes Manifests
 
-    - Create Deployment.yaml file
-    
-    - Create service.yaml of type Loadbalancer
+- deployment.yaml
 
-# deploy our pods
+- service.yaml (type: LoadBalancer)
 
-        - Go inside the manifest folder
-        
-        - kubectl apply -f deployment.yaml
-        
-        - kubectl apply -f service.yaml
+# Deploy
 
-# Verify your deployment
+kubectl apply -f deployment.yaml
 
-        - kubectl get nodes
-        
-        - kubectl get pods
+kubectl apply -f service.yaml
+
+# Verify
+
+kubectl get nodes
+
+kubectl get pods
 
 ![Project Image](https://github.com/efritznel/eks-project/blob/main/Kubectl%20commands.GIF)
 
-# Deploy our web app manifest files using HELM
+# Step 7: Deploy Application Using Helm
 
-    1. go inside the manifest folder
-		
-	2. Create a custom HELM chart: "helm create app"
-		
-	3. The chart folder will be created with the following files and folders
-			
-		- templates (a folder with all the yaml files inside like: deployment.yaml, service.yaml)
-			
-		- Chart.yaml (for metadata)
-			
-		- values.yaml (to add the default value for the variables we are using in Deployment and Service .yaml)
+# Create Helm Chart
+
+helm create app
+
+# Chart structure:
+
+- templates/
+
+- Chart.yaml
+
+- values.yaml
+
+# Sample Deployment Template
 
 ```yaml
 # deployment.yaml
@@ -153,8 +179,6 @@ spec:
               containerPort: {{ .Values.service.targetPort | default 80 }}
               protocol: TCP
 ```
-
-***************************************************************************
 ```yaml
 #service.yaml
 apiVersion: v1
@@ -173,7 +197,7 @@ spec:
       port: {{ .Values.service.port | default 80 }}
       targetPort: {{ .Values.service.targetPort | default 80 }}
 ```
-***************************************************************************
+
 ```yaml
 #value.yaml
 deploymentName: webapp
@@ -200,18 +224,37 @@ service:
   port: 80
   targetPort: 80
   ```
-***************************************************************************		
-	4. Validate the manifest file: "helm template app/"
-		
-	5. Install the application: "helm install webapp app/"
+# Validate Chart
 
-	6. List kubernetes cluster: "helm ls"
+helm template app/
 
-# Access our web app from our internet browser using the Load balancer DNS name
+# Install Application
+
+helm install webapp app/
+
+# List Releases
+
+helm ls
+
+# Step 8: Access the Application
+
+Retrieve the Load Balancer DNS name:
+
+kubectl get svc
+
+Open the DNS name in a browser to access the application.
+
 ![Project Image](https://github.com/efritznel/eks-project/blob/main/Access%20webpage.GIF)
 
+# Key Takeaways
 
+- End-to-end infrastructure automation with Terraform
 
-        
+- Secure and scalable EKS design
 
+- Dockerized application workflow
+
+- Kubernetes deployment via kubectl and Helm
+
+- Production-ready architecture suitable for CI/CD pipelines
 
